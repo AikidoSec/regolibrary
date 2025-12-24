@@ -380,6 +380,12 @@
       "patch": {
         "name": "ingress-nginx-end-of-life"
       }
+    },
+    {
+      "controlID": "C-0292",
+      "patch": {
+        "name": "CVE-2025-14847-mongodb-zlib-memory-read"
+      }
     }
   ]
 }
