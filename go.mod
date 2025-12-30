@@ -1,6 +1,6 @@
 module github.com/kubescape/regolibrary/v2
 
-go 1.24.6
+go 1.25.4
 
 require (
 	github.com/armosec/armoapi-go v0.0.655
