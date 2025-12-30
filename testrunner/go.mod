@@ -1,8 +1,6 @@
 module testrunner
 
-go 1.23.8
-
-toolchain go1.24.2
+go 1.25.4
 
 require (
 	github.com/armosec/armoapi-go v0.0.330
