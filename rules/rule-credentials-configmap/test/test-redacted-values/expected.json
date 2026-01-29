@@ -1,0 +1,22 @@
+[
+    {
+        "alertMessage": "this configmap has sensitive information: test-configmap",
+        "deletePaths": ["data[secret_key]"],
+        "failedPaths": ["data[secret_key]"],
+        "fixPaths": [],
+        "ruleStatus": "",
+        "packagename": "armo_builtins",
+        "alertScore": 9,
+        "alertObject": {
+            "k8sApiObjects": [
+                {
+                    "apiVersion": "v1",
+                    "kind": "ConfigMap",
+                    "metadata": {
+                        "name": "test-configmap"
+                    }
+                }
+            ]
+        }
+    }
+]

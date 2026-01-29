@@ -15,6 +15,7 @@ deny[msga] {
     # check that value or key weren't allowed by user
     not is_allowed_value(map_secret)
     not is_allowed_key_name(map_key)
+    not is_redacted_value(map_secret)
 
     path := sprintf("data[%v]", [map_key])
 
@@ -47,6 +48,7 @@ deny[msga] {
     # check that value or key weren't allowed by user
     not is_allowed_value(map_secret)
     not is_allowed_key_name(map_key)
+    not is_redacted_value(map_secret)
 
     path := sprintf("data[%v]", [map_key])
 
@@ -81,6 +83,7 @@ deny[msga] {
     # check that value or key weren't allowed by user
     not is_allowed_value(map_secret)
     not is_allowed_key_name(map_key)
+    not is_redacted_value(map_secret)
 
     path := sprintf("data[%v]", [map_key])
 
@@ -105,4 +108,8 @@ is_allowed_value(value) {
 is_allowed_key_name(key_name) {
     allow_key := data.postureControlInputs.sensitiveKeyNamesAllowed[_]
     contains(lower(key_name), lower(allow_key))
+}
+
+is_redacted_value(value) {
+    regex.match("^redacted-[a-f0-9]{64}$", value)
 }
