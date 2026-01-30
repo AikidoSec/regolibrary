@@ -1,0 +1,62 @@
+[
+    {
+        "alertMessage": "this configmap has sensitive information: test-configmap",
+        "deletePaths": ["data[database_password]"],
+        "failedPaths": ["data[database_password]"],
+        "fixPaths": [],
+        "ruleStatus": "",
+        "packagename": "armo_builtins",
+        "alertScore": 9,
+        "alertObject": {
+            "k8sApiObjects": [
+                {
+                    "apiVersion": "v1",
+                    "kind": "ConfigMap",
+                    "metadata": {
+                        "name": "test-configmap"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "alertMessage": "this configmap has sensitive information: test-configmap",
+        "deletePaths": ["data[api_token]"],
+        "failedPaths": ["data[api_token]"],
+        "fixPaths": [],
+        "ruleStatus": "",
+        "packagename": "armo_builtins",
+        "alertScore": 9,
+        "alertObject": {
+            "k8sApiObjects": [
+                {
+                    "apiVersion": "v1",
+                    "kind": "ConfigMap",
+                    "metadata": {
+                        "name": "test-configmap"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "alertMessage": "this configmap has sensitive information: test-configmap",
+        "deletePaths": ["data[custom_setting]"],
+        "failedPaths": ["data[custom_setting]"],
+        "fixPaths": [],
+        "ruleStatus": "",
+        "packagename": "armo_builtins",
+        "alertScore": 9,
+        "alertObject": {
+            "k8sApiObjects": [
+                {
+                    "apiVersion": "v1",
+                    "kind": "ConfigMap",
+                    "metadata": {
+                        "name": "test-configmap"
+                    }
+                }
+            ]
+        }
+    }
+]
