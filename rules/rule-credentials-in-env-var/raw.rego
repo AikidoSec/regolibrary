@@ -11,12 +11,12 @@
 
 		contains(lower(env.name), lower(key_name))
 		env.value != ""
+		is_redacted_value(env.value)
 		# check that value or key weren't allowed by user
     	not is_allowed_value(env.value)
     	not is_allowed_key_name(env.name)
 
 		is_not_reference(env)
-		not is_redacted_value(env.value)
 
 		paths := [sprintf("spec.containers[%v].env[%v].name", [i, j]),
 				  sprintf("spec.containers[%v].env[%v].value", [i, j])]
@@ -47,12 +47,12 @@
 
 		contains(lower(env.name), lower(key_name))
 		env.value != ""
+		is_redacted_value(env.value)
 		# check that value or key weren't allowed by user
     	not is_allowed_value(env.value)
     	not is_allowed_key_name(env.name)
 
 		is_not_reference(env)
-		not is_redacted_value(env.value)
 
 		paths := [sprintf("spec.template.spec.containers[%v].env[%v].name", [i, j]),
 				sprintf("spec.template.spec.containers[%v].env[%v].value", [i, j])]
@@ -81,12 +81,12 @@
 
 		contains(lower(env.name), lower(key_name))
 		env.value != ""
+		is_redacted_value(env.value)
 		# check that value or key weren't allowed by user
     	not is_allowed_value(env.value)
     	not is_allowed_key_name(env.name)
 
 		is_not_reference(env)
-		not is_redacted_value(env.value)
 
 		paths := [sprintf("spec.jobTemplate.spec.template.spec.containers[%v].env[%v].name", [i, j]),
 				  sprintf("spec.jobTemplate.spec.template.spec.containers[%v].env[%v].value", [i, j])]
@@ -115,12 +115,12 @@ deny[msga] {
 		env := container.env[j]
 
 		contains(lower(env.value), lower(value))
+		is_redacted_value(env.value)
 		# check that value or key weren't allowed by user
     	not is_allowed_value(env.value)
     	not is_allowed_key_name(env.name)
 
 		is_not_reference(env)
-		not is_redacted_value(env.value)
 
 		paths := [sprintf("spec.containers[%v].env[%v].name", [i, j]),
 				  sprintf("spec.containers[%v].env[%v].value", [i, j])]
@@ -150,12 +150,12 @@ deny[msga] {
 		env := container.env[j]
 
 		contains(lower(env.value), lower(value))
+		is_redacted_value(env.value)
 		# check that value or key weren't allowed by user
     	not is_allowed_value(env.value)
     	not is_allowed_key_name(env.name)
 
 		is_not_reference(env)
-		not is_redacted_value(env.value)
 
 		paths := [sprintf("spec.template.spec.containers[%v].env[%v].name", [i, j]),
 				sprintf("spec.template.spec.containers[%v].env[%v].value", [i, j])]
@@ -183,12 +183,12 @@ deny[msga] {
 		env := container.env[j]
 
 		contains(lower(env.value), lower(value))
+		is_redacted_value(env.value)
 		# check that value or key weren't allowed by user
     	not is_allowed_value(env.value)
     	not is_allowed_key_name(env.name)
 
 		is_not_reference(env)
-		not is_redacted_value(env.value)
 
 		paths := [sprintf("spec.jobTemplate.spec.template.spec.containers[%v].env[%v].name", [i, j]),
 				  sprintf("spec.jobTemplate.spec.template.spec.containers[%v].env[%v].value", [i, j])]
@@ -206,6 +206,95 @@ deny[msga] {
 		}
 	}
 
+# flags redacted values (API-detected secrets) regardless of key name
+deny[msga] {
+	pod := input[_]
+	pod.kind == "Pod"
+	container := pod.spec.containers[i]
+	env := container.env[j]
+
+	is_redacted_value(env.value)
+
+	not is_allowed_value(env.value)
+	not is_allowed_key_name(env.name)
+
+	is_not_reference(env)
+
+	paths := [sprintf("spec.containers[%v].env[%v].name", [i, j]),
+			  sprintf("spec.containers[%v].env[%v].value", [i, j])]
+
+	msga := {
+		"alertMessage": sprintf("Pod: %v has sensitive information in environment variables", [pod.metadata.name]),
+		"alertScore": 9,
+		"fixPaths": [],
+		"deletePaths": paths,
+		"failedPaths": paths,
+		"packagename": "armo_builtins",
+		"alertObject": {
+			"k8sApiObjects": [pod]
+		}
+	}
+}
+
+deny[msga] {
+	wl := input[_]
+	spec_template_spec_patterns := {"Deployment","ReplicaSet","DaemonSet","StatefulSet","Job"}
+	spec_template_spec_patterns[wl.kind]
+
+	container := wl.spec.template.spec.containers[i]
+	env := container.env[j]
+
+	is_redacted_value(env.value)
+
+	not is_allowed_value(env.value)
+	not is_allowed_key_name(env.name)
+
+	is_not_reference(env)
+
+	paths := [sprintf("spec.template.spec.containers[%v].env[%v].name", [i, j]),
+			sprintf("spec.template.spec.containers[%v].env[%v].value", [i, j])]
+
+	msga := {
+		"alertMessage": sprintf("%v: %v has sensitive information in environment variables", [wl.kind, wl.metadata.name]),
+		"alertScore": 9,
+		"fixPaths": [],
+		"deletePaths": paths,
+		"failedPaths": paths,
+		"packagename": "armo_builtins",
+		"alertObject": {
+			"k8sApiObjects": [wl]
+		}
+	}
+}
+
+deny[msga] {
+	wl := input[_]
+	wl.kind == "CronJob"
+	container := wl.spec.jobTemplate.spec.template.spec.containers[i]
+	env := container.env[j]
+
+	is_redacted_value(env.value)
+
+	not is_allowed_value(env.value)
+	not is_allowed_key_name(env.name)
+
+	is_not_reference(env)
+
+	paths := [sprintf("spec.jobTemplate.spec.template.spec.containers[%v].env[%v].name", [i, j]),
+			  sprintf("spec.jobTemplate.spec.template.spec.containers[%v].env[%v].value", [i, j])]
+
+	msga := {
+		"alertMessage": sprintf("Cronjob: %v has sensitive information in environment variables", [wl.metadata.name]),
+		"alertScore": 9,
+		"fixPaths": [],
+		"deletePaths": paths,
+		"failedPaths": paths,
+		"packagename": "armo_builtins",
+		"alertObject": {
+			"k8sApiObjects": [wl]
+		}
+	}
+}
 
 is_not_reference(env)
 {

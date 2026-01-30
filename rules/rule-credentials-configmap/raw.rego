@@ -11,11 +11,11 @@ deny[msga] {
     map_secret != ""
 
     contains(lower(map_key), lower(key_name))
+    is_redacted_value(map_secret)
 
     # check that value or key weren't allowed by user
     not is_allowed_value(map_secret)
     not is_allowed_key_name(map_key)
-    not is_redacted_value(map_secret)
 
     path := sprintf("data[%v]", [map_key])
 
@@ -44,11 +44,11 @@ deny[msga] {
     map_secret != ""
 
     regex.match(value , map_secret)
+    is_redacted_value(map_secret)
 
     # check that value or key weren't allowed by user
     not is_allowed_value(map_secret)
     not is_allowed_key_name(map_key)
-    not is_redacted_value(map_secret)
 
     path := sprintf("data[%v]", [map_key])
 
@@ -79,11 +79,11 @@ deny[msga] {
     decoded_secret := base64.decode(map_secret)
 
     regex.match(value , decoded_secret)
+    is_redacted_value(map_secret)
 
     # check that value or key weren't allowed by user
     not is_allowed_value(map_secret)
     not is_allowed_key_name(map_key)
-    not is_redacted_value(map_secret)
 
     path := sprintf("data[%v]", [map_key])
 
@@ -92,6 +92,33 @@ deny[msga] {
 		"alertScore": 9,
 		"deletePaths": [path],
        "failedPaths": [path],
+        "fixPaths": [],
+		"packagename": "armo_builtins",
+          "alertObject": {
+			"k8sApiObjects": [configmap]
+		}
+     }
+}
+
+# fails if config map has redacted values (API-detected secrets)
+deny[msga] {
+	configmap := input[_]
+    configmap.kind == "ConfigMap"
+    map_secret := configmap.data[map_key]
+    map_secret != ""
+
+    is_redacted_value(map_secret)
+
+    not is_allowed_value(map_secret)
+    not is_allowed_key_name(map_key)
+
+    path := sprintf("data[%v]", [map_key])
+
+	msga := {
+		"alertMessage": sprintf("this configmap has sensitive information: %v", [configmap.metadata.name]),
+		"alertScore": 9,
+		"deletePaths": [path],
+        "failedPaths": [path],
         "fixPaths": [],
 		"packagename": "armo_builtins",
           "alertObject": {

@@ -13,5 +13,5 @@ spec:
         value: "redacted-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       - name: API_TOKEN
         value: "redacted-a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
-      - name: SECRET_KEY
-        value: "actual-secret-value"
+      - name: CUSTOM_SETTING
+        value: "redacted-abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
