@@ -1,0 +1,19 @@
+{
+    "name": "CVE-2026-24513-nginx-ingress-auth-url-protection-bypass",
+    "attributes": {
+        "controlTypeTags": ["security", "compliance"]
+    },
+    "description": "CVE-2026-24513 is a low severity vulnerability in ingress-nginx controller that allows auth-url protection bypass when using a defective custom-errors backend that does not respect the X-Code HTTP header.",
+    "remediation": "Upgrade ingress-nginx to v1.13.7, v1.14.3, or newer versions. Alternatively, verify that custom-errors backends properly respect the X-Code HTTP header.",
+    "test": "The control checks for vulnerable versions of ingress-nginx controller (all versions prior to v1.13.7, and v1.14.0 through v1.14.2).",
+    "rulesNames": ["nginx-ingress-auth-url-protection-bypass"],
+    "long_description": "CVE-2026-24513 is a low severity security flaw affecting ingress-nginx with a CVSS v3.1 score of 3.1. The vulnerability allows authentication protections to be bypassed under specific misconfiguration scenarios. If the controller is configured with a defective custom-errors backend for HTTP 401/403 errors that fails to respect the X-Code HTTP header, authenticated access controls enforced via the auth-url annotation can be circumvented. The built-in custom-errors backend functions correctly; exploitation requires administrators to implement a broken external error-handling component. The vulnerability affects all versions prior to v1.13.7 and versions v1.14.0 through v1.14.2.",
+    "controlID": "C-0295",
+    "baseScore": 3.1,
+    "category": {
+        "name": "Workload"
+    },
+    "scanningScope": {
+        "matches": ["cluster", "file"]
+    }
+}
