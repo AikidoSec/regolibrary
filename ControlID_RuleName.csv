@@ -228,3 +228,7 @@ CIS-5.7.4,resources-notpods-in-default-namespace
 C-0290,nginx-ingress-arbitrary-code-execution
 C-0291,ingress-nginx-end-of-life
 C-0292,mongodb-zlib-memory-read
+C-0293,nginx-ingress-auth-method-config-injection
+C-0294,nginx-ingress-path-rules-config-injection
+C-0295,nginx-ingress-auth-url-protection-bypass
+C-0296,nginx-ingress-admission-controller-dos

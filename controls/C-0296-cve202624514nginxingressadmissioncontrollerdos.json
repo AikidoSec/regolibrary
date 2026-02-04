@@ -1,0 +1,19 @@
+{
+    "name": "CVE-2026-24514-nginx-ingress-admission-controller-dos",
+    "attributes": {
+        "controlTypeTags": ["security", "compliance"]
+    },
+    "description": "CVE-2026-24514 is a high severity vulnerability in ingress-nginx controller that allows denial of service via oversized requests to the validating admission controller, causing excessive memory consumption.",
+    "remediation": "Upgrade ingress-nginx to v1.13.7, v1.14.3, or newer versions.",
+    "test": "The control checks for vulnerable versions of ingress-nginx controller (all versions prior to v1.13.7, and v1.14.0 through v1.14.2).",
+    "rulesNames": ["nginx-ingress-admission-controller-dos"],
+    "long_description": "CVE-2026-24514 is a high severity security flaw affecting ingress-nginx with a CVSS v3.1 score of 6.5. The vulnerability allows attackers to send oversized requests to the validating admission controller, triggering excessive memory consumption. This can result in the controller pod being terminated or exhaustion of node resources. The vulnerability affects all versions prior to v1.13.7 and versions v1.14.0 through v1.14.2.",
+    "controlID": "C-0296",
+    "baseScore": 6.5,
+    "category": {
+        "name": "Workload"
+    },
+    "scanningScope": {
+        "matches": ["cluster", "file"]
+    }
+}

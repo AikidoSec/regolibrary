@@ -1,0 +1,19 @@
+{
+    "name": "CVE-2026-1580-nginx-ingress-auth-method-config-injection",
+    "attributes": {
+        "controlTypeTags": ["security", "compliance"]
+    },
+    "description": "CVE-2026-1580 is a critical vulnerability in ingress-nginx controller that allows attackers to inject nginx configuration via the nginx.ingress.kubernetes.io/auth-method annotation, leading to arbitrary code execution and disclosure of Secrets.",
+    "remediation": "Upgrade ingress-nginx to v1.13.7, v1.14.3, or newer versions. Alternatively, deploy a validating admission controller to reject Ingress resources using the nginx.ingress.kubernetes.io/auth-method annotation.",
+    "test": "The control checks for vulnerable versions of ingress-nginx controller (all versions prior to v1.13.7, and v1.14.0 through v1.14.2).",
+    "rulesNames": ["nginx-ingress-auth-method-config-injection"],
+    "long_description": "CVE-2026-1580 is a critical security flaw affecting ingress-nginx with a CVSS v3.1 score of 8.8. The vulnerability allows attackers to exploit the nginx.ingress.kubernetes.io/auth-method annotation in Kubernetes Ingress resources to inject nginx configuration. This can lead to arbitrary code execution in the context of the ingress-nginx controller and disclosure of Secrets accessible to the controller. In default configurations, the ingress-nginx controller has cluster-wide Secret access, making the potential impact severe. The vulnerability affects all versions prior to v1.13.7 and versions v1.14.0 through v1.14.2.",
+    "controlID": "C-0293",
+    "baseScore": 8.8,
+    "category": {
+        "name": "Workload"
+    },
+    "scanningScope": {
+        "matches": ["cluster", "file"]
+    }
+}
