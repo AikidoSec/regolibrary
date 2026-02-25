@@ -1,23 +1,33 @@
 package armo_builtins
 
 # input: regoResponseVectorObject
-# fails if a subject that is not dashboard service account is bound to dashboard role
+# fails if a subject that is not dashboard service account is bound to dashboard role/clusterrole
 
 deny[msga] {
 	subjectVector := input[_]
-	role := subjectVector.relatedObjects[i]
-	rolebinding := subjectVector.relatedObjects[j]
-	endswith(subjectVector.relatedObjects[i].kind, "Role")
-	endswith(subjectVector.relatedObjects[j].kind, "Binding")
-
-	role.metadata.name == "kubernetes-dashboard"
 	subjectVector.name != "kubernetes-dashboard"
 
+	some j
+	rolebinding := subjectVector.relatedObjects[j]
+	endswith(rolebinding.kind, "Binding")
+
+	some k
 	subject := rolebinding.subjects[k]
-    path := [sprintf("relatedObjects[%v].subjects[%v]", [format_int(j, 10), format_int(k, 10)])]
-	finalpath := array.concat(path, [sprintf("relatedObjects[%v].roleRef.name", [format_int(j, 10)])])
+	is_same_subjects(subjectVector, subject)
+
+	some i
+	role := subjectVector.relatedObjects[i]
+	endswith(role.kind, "Role")
+	role.metadata.name == "kubernetes-dashboard"
+	rolebinding.roleRef.name == role.metadata.name
+
+	finalpath := [
+		sprintf("relatedObjects[%d].subjects[%d]", [j, k]),
+		sprintf("relatedObjects[%d].roleRef.name", [j]),
+	]
+
 	msga := {
-		"alertMessage": sprintf("Subject: %v-%v is bound to dashboard role/clusterrole", [subjectVector.kind, subjectVector.name]),
+		"alertMessage": sprintf("Subject: %s-%s is bound to dashboard role/clusterrole", [subjectVector.kind, subjectVector.name]),
 		"alertScore": 9,
 		"reviewPaths": finalpath,
 		"failedPaths": finalpath,
@@ -28,4 +38,18 @@ deny[msga] {
 			"externalObjects": subjectVector
 		}
 	}
+}
+
+# for service accounts
+is_same_subjects(sv, subject) {
+	sv.kind == subject.kind
+	sv.name == subject.name
+	sv.namespace == subject.namespace
+}
+
+# for users/groups
+is_same_subjects(sv, subject) {
+	sv.kind == subject.kind
+	sv.name == subject.name
+	sv.apiGroup == subject.apiGroup
 }
