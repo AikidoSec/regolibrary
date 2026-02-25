@@ -1,9 +1,9 @@
 package armo_builtins
 
-import future.keywords.in
+import rego.v1
 
 # fails if user can delete important resources
-deny[msga] {
+deny contains msga if {
 	some subjectVector in input
 
 	# High-selectivity pruning first: binding + matching subject
@@ -25,32 +25,32 @@ deny[msga] {
 	rule := role.rules[p]
 
 	some verb in rule.verbs
-	is_delete_verb(verb)
+	verb in {"delete", "deletecollection", "*"}
 
 	some api_group in rule.apiGroups
-	is_target_api_group(api_group)
+	api_group in {"", "*", "apps", "batch"}
 
 	some resource in rule.resources
-	is_important_resource(resource)
+	resource in {"secrets", "pods", "services", "deployments", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs", "*"}
 
 	rule_path := sprintf("relatedObjects[%d].rules[%d]", [i, p])
 
 	verb_path := [sprintf("%s.verbs[%d]", [rule_path, l]) |
 		some l
 		v := rule.verbs[l]
-		is_delete_verb(v)
+		v in {"delete", "deletecollection", "*"}
 	]
 
 	api_groups_path := [sprintf("%s.apiGroups[%d]", [rule_path, a]) |
 		some a
 		g := rule.apiGroups[a]
-		is_target_api_group(g)
+		g in {"", "*", "apps", "batch"}
 	]
 
 	resources_path := [sprintf("%s.resources[%d]", [rule_path, r]) |
 		some r
 		res := rule.resources[r]
-		is_important_resource(res)
+		res in {"secrets", "pods", "services", "deployments", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs", "*"}
 	]
 
 	finalpath := array.concat(
@@ -75,35 +75,15 @@ deny[msga] {
 	}
 }
 
-is_delete_verb(v) { v == "delete" }
-is_delete_verb(v) { v == "deletecollection" }
-is_delete_verb(v) { v == "*" }
-
-is_target_api_group(g) { g == "" }
-is_target_api_group(g) { g == "*" }
-is_target_api_group(g) { g == "apps" }
-is_target_api_group(g) { g == "batch" }
-
-is_important_resource(r) { r == "secrets" }
-is_important_resource(r) { r == "pods" }
-is_important_resource(r) { r == "services" }
-is_important_resource(r) { r == "deployments" }
-is_important_resource(r) { r == "replicasets" }
-is_important_resource(r) { r == "daemonsets" }
-is_important_resource(r) { r == "statefulsets" }
-is_important_resource(r) { r == "jobs" }
-is_important_resource(r) { r == "cronjobs" }
-is_important_resource(r) { r == "*" }
-
 # for service accounts
-is_same_subjects(subjectVector, subject) {
+is_same_subjects(subjectVector, subject) if {
 	subjectVector.kind == subject.kind
 	subjectVector.name == subject.name
 	subjectVector.namespace == subject.namespace
 }
 
 # for users/groups
-is_same_subjects(subjectVector, subject) {
+is_same_subjects(subjectVector, subject) if {
 	subjectVector.kind == subject.kind
 	subjectVector.name == subject.name
 	subjectVector.apiGroup == subject.apiGroup

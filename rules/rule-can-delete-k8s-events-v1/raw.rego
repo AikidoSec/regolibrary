@@ -1,9 +1,9 @@
 package armo_builtins
 
-import future.keywords.in
+import rego.v1
 
 # fails if user can delete events
-deny[msga] {
+deny contains msga if {
 	some subjectVector in input
 
 	# High-selectivity pruning first
@@ -25,32 +25,32 @@ deny[msga] {
 	rule := role.rules[p]
 
 	some verb in rule.verbs
-	is_delete_verb(verb)
+	verb in {"delete", "deletecollection", "*"}
 
 	some api_group in rule.apiGroups
-	is_events_api_group(api_group)
+	api_group in {"", "*"}
 
 	some resource in rule.resources
-	is_events_resource(resource)
+	resource in {"events", "*"}
 
 	rule_path := sprintf("relatedObjects[%d].rules[%d]", [i, p])
 
 	verb_path := [sprintf("%s.verbs[%d]", [rule_path, l]) |
 		some l
 		v := rule.verbs[l]
-		is_delete_verb(v)
+		v in {"delete", "deletecollection", "*"}
 	]
 
 	api_groups_path := [sprintf("%s.apiGroups[%d]", [rule_path, a]) |
 		some a
 		g := rule.apiGroups[a]
-		is_events_api_group(g)
+		g in {"", "*"}
 	]
 
 	resources_path := [sprintf("%s.resources[%d]", [rule_path, r]) |
 		some r
 		res := rule.resources[r]
-		is_events_resource(res)
+		res in {"events", "*"}
 	]
 
 	finalpath := array.concat(
@@ -75,25 +75,15 @@ deny[msga] {
 	}
 }
 
-is_delete_verb(v) { v == "delete" }
-is_delete_verb(v) { v == "deletecollection" }
-is_delete_verb(v) { v == "*" }
-
-is_events_api_group(g) { g == "" }
-is_events_api_group(g) { g == "*" }
-
-is_events_resource(r) { r == "events" }
-is_events_resource(r) { r == "*" }
-
 # for service accounts
-is_same_subjects(subjectVector, subject) {
+is_same_subjects(subjectVector, subject) if {
 	subjectVector.kind == subject.kind
 	subjectVector.name == subject.name
 	subjectVector.namespace == subject.namespace
 }
 
 # for users/groups
-is_same_subjects(subjectVector, subject) {
+is_same_subjects(subjectVector, subject) if {
 	subjectVector.kind == subject.kind
 	subjectVector.name == subject.name
 	subjectVector.apiGroup == subject.apiGroup

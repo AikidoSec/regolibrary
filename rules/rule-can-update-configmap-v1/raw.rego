@@ -1,8 +1,10 @@
 package armo_builtins
 
+import rego.v1
+
 # Fails if user can modify all configmaps
-deny[msga] {
-	subjectVector := input[_]
+deny contains msga if {
+	some subjectVector in input
 
 	some j
 	rolebinding := subjectVector.relatedObjects[j]
@@ -24,34 +26,34 @@ deny[msga] {
 
 	some lv
 	verb := rule.verbs[lv]
-	is_configmap_mutation_verb(verb)
+	verb in {"update", "patch", "*"}
 
 	some la
 	apiGroup := rule.apiGroups[la]
-	is_core_or_wildcard_group(apiGroup)
+	apiGroup in {"", "*"}
 
 	some lr
 	resource := rule.resources[lr]
-	is_configmap_or_wildcard_resource(resource)
+	resource in {"configmaps", "*"}
 
 	rule_path := sprintf("relatedObjects[%d].rules[%d]", [i, p])
 
 	verb_path := [sprintf("%s.verbs[%d]", [rule_path, l]) |
 		some l
 		v := rule.verbs[l]
-		is_configmap_mutation_verb(v)
+		v in {"update", "patch", "*"}
 	]
 
 	api_groups_path := [sprintf("%s.apiGroups[%d]", [rule_path, a]) |
 		some a
 		g := rule.apiGroups[a]
-		is_core_or_wildcard_group(g)
+		g in {"", "*"}
 	]
 
 	resources_path := [sprintf("%s.resources[%d]", [rule_path, r]) |
 		some r
 		res := rule.resources[r]
-		is_configmap_or_wildcard_resource(res)
+		res in {"configmaps", "*"}
 	]
 
 	finalpath := array.concat(
@@ -77,8 +79,8 @@ deny[msga] {
 }
 
 # Fails if user can modify the 'coredns' configmap (default for coredns)
-deny[msga] {
-	subjectVector := input[_]
+deny contains msga if {
+	some subjectVector in input
 
 	some j
 	rolebinding := subjectVector.relatedObjects[j]
@@ -101,34 +103,34 @@ deny[msga] {
 
 	some lv
 	verb := rule.verbs[lv]
-	is_configmap_mutation_verb(verb)
+	verb in {"update", "patch", "*"}
 
 	some la
 	apiGroup := rule.apiGroups[la]
-	is_core_or_wildcard_group(apiGroup)
+	apiGroup in {"", "*"}
 
 	some lr
 	resource := rule.resources[lr]
-	is_configmap_or_wildcard_resource(resource)
+	resource in {"configmaps", "*"}
 
 	rule_path := sprintf("relatedObjects[%d].rules[%d]", [i, p])
 
 	verb_path := [sprintf("%s.verbs[%d]", [rule_path, l]) |
 		some l
 		v := rule.verbs[l]
-		is_configmap_mutation_verb(v)
+		v in {"update", "patch", "*"}
 	]
 
 	api_groups_path := [sprintf("%s.apiGroups[%d]", [rule_path, a]) |
 		some a
 		g := rule.apiGroups[a]
-		is_core_or_wildcard_group(g)
+		g in {"", "*"}
 	]
 
 	resources_path := [sprintf("%s.resources[%d]", [rule_path, r]) |
 		some r
 		res := rule.resources[r]
-		is_configmap_or_wildcard_resource(res)
+		res in {"configmaps", "*"}
 	]
 
 	finalpath := array.concat(
@@ -144,6 +146,7 @@ deny[msga] {
 		"alertScore": 3,
 		"reviewPaths": finalpath,
 		"failedPaths": finalpath,
+		"fixPaths": [],
 		"packagename": "armo_builtins",
 		"alertObject": {
 			"k8sApiObjects": [],
@@ -152,25 +155,15 @@ deny[msga] {
 	}
 }
 
-is_configmap_mutation_verb(v) { v == "update" }
-is_configmap_mutation_verb(v) { v == "patch" }
-is_configmap_mutation_verb(v) { v == "*" }
-
-is_core_or_wildcard_group(g) { g == "" }
-is_core_or_wildcard_group(g) { g == "*" }
-
-is_configmap_or_wildcard_resource(r) { r == "configmaps" }
-is_configmap_or_wildcard_resource(r) { r == "*" }
-
 # for service accounts
-is_same_subjects(subjectVector, subject) {
+is_same_subjects(subjectVector, subject) if {
 	subjectVector.kind == subject.kind
 	subjectVector.name == subject.name
 	subjectVector.namespace == subject.namespace
 }
 
 # for users/groups
-is_same_subjects(subjectVector, subject) {
+is_same_subjects(subjectVector, subject) if {
 	subjectVector.kind == subject.kind
 	subjectVector.name == subject.name
 	subjectVector.apiGroup == subject.apiGroup
