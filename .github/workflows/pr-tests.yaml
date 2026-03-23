@@ -63,7 +63,7 @@ jobs:
           GOPATH=$(go env GOPATH) make
 
       - name: Set up Regal
-        uses: StyraInc/setup-regal@v1
+        uses: StyraInc/setup-regal@33a142b1189004e0f14bf42b15972c67eecce776 # v1.0.0
         with:
           version: v0.10.1
 
