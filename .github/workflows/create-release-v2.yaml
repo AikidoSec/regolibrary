@@ -144,7 +144,7 @@ jobs:
           echo "SHORT_TAG=$SHORT_TAG" >> $GITHUB_ENV
 
       - name: Force Push Short Tag
-        uses: rickstaa/action-create-tag@v1
+        uses: rickstaa/action-create-tag@a1c7777fcb2fee4f19b0f283ba888afa11678b72 # v1
         with:
           tag: ${{ env.SHORT_TAG }}
           force_push_tag: true
