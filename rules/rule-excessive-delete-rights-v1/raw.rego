@@ -6,20 +6,13 @@ import rego.v1
 deny contains msga if {
 	some subjectVector in input
 
-	# High-selectivity pruning first: binding + matching subject
-	some j
-	rolebinding := subjectVector.relatedObjects[j]
-	endswith(rolebinding.kind, "Binding")
-
-	some k
-	subject := rolebinding.subjects[k]
-	is_same_subjects(subjectVector, subject)
-
-	# Enforce RBAC linkage: binding must reference the matched role
+	# High-selectivity pruning: find roles with excessive delete rights first.
+	# In large clusters there are far fewer "dangerous" roles than bindings, so
+	# finding the role/rule first prunes the search space before expanding into
+	# bindings and subjects.
 	some i
 	role := subjectVector.relatedObjects[i]
 	endswith(role.kind, "Role")
-	role.metadata.name == rolebinding.roleRef.name
 
 	some p
 	rule := role.rules[p]
@@ -33,24 +26,32 @@ deny contains msga if {
 	some resource in rule.resources
 	resource in {"secrets", "pods", "services", "deployments", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs", "*"}
 
+	# Enforce RBAC linkage: find a binding that references this role
+	some j
+	rolebinding := subjectVector.relatedObjects[j]
+	endswith(rolebinding.kind, "Binding")
+	rolebinding.roleRef.name == role.metadata.name
+
+	# Verify the subjectVector is listed as a subject in this binding
+	some k
+	subject := rolebinding.subjects[k]
+	is_same_subjects(subjectVector, subject)
+
 	rule_path := sprintf("relatedObjects[%d].rules[%d]", [i, p])
 
 	verb_path := [sprintf("%s.verbs[%d]", [rule_path, l]) |
 		some l
-		v := rule.verbs[l]
-		v in {"delete", "deletecollection", "*"}
+		rule.verbs[l] in {"delete", "deletecollection", "*"}
 	]
 
 	api_groups_path := [sprintf("%s.apiGroups[%d]", [rule_path, a]) |
 		some a
-		g := rule.apiGroups[a]
-		g in {"", "*", "apps", "batch"}
+		rule.apiGroups[a] in {"", "*", "apps", "batch"}
 	]
 
 	resources_path := [sprintf("%s.resources[%d]", [rule_path, r]) |
 		some r
-		res := rule.resources[r]
-		res in {"secrets", "pods", "services", "deployments", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs", "*"}
+		rule.resources[r] in {"secrets", "pods", "services", "deployments", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs", "*"}
 	]
 
 	finalpath := array.concat(
