@@ -415,6 +415,12 @@
             "patch": {
                 "name": "CVE-2026-24514-nginx-ingress-admission-controller-dos"
             }
+        },
+        {
+            "controlID": "C-0297",
+            "patch": {
+                "name": "CVE-2026-42880-argocd-server-side-diff-secret-extraction"
+            }
         }
     ]
 }
