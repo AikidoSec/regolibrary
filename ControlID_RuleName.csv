@@ -232,3 +232,4 @@ C-0293,nginx-ingress-auth-method-config-injection
 C-0294,nginx-ingress-path-rules-config-injection
 C-0295,nginx-ingress-auth-url-protection-bypass
 C-0296,nginx-ingress-admission-controller-dos
+C-0297,argocd-server-side-diff-secret-extraction
