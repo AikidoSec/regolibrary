@@ -1,6 +1,6 @@
 module github.com/kubescape/regolibrary/v2
 
-go 1.27.0
+go 1.27.3
 
 require (
 	github.com/armosec/armoapi-go v0.0.655
@@ -64,7 +64,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/analysis v0.24.1 // indirect
