@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: centraldashboard
+  namespace: kubeflow
+  labels:
+    team: ml
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: centraldashboard
+  template:
+    metadata:
+      labels:
+        app: centraldashboard
+        tier: web
+    spec:
+      containers:
+        - name: centraldashboard
+          image: ghcr.io/kubeflow/kubeflow/central-dashboard:v1.10.0
+          ports:
+            - containerPort: 8082

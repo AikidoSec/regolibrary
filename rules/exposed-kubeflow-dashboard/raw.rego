@@ -47,6 +47,10 @@ wl_connectedto_service(wl, service) {
 	wl.spec.selector.matchLabels == service.spec.selector
 }
 
+wl_connectedto_service(wl, service) {
+	count({x | service.spec.selector[x] == wl.spec.template.metadata.labels[x]}) == count(service.spec.selector)
+}
+
 has_external_address(service) {
 	service.status.loadBalancer.ingress[_].ip
 }
@@ -99,7 +103,9 @@ is_source_restricted(service) {
 	not allows_any_source(service)
 }
 
+# Merging catches split ranges such as 0.0.0.0/1 + 128.0.0.0/1 that together allow every address
 allows_any_source(service) {
 	any_source_ranges := {"0.0.0.0/0", "::/0"}
-	any_source_ranges[service.spec.loadBalancerSourceRanges[_]]
+	merged_ranges := net.cidr_merge(service.spec.loadBalancerSourceRanges)
+	any_source_ranges[merged_ranges[_]]
 }
