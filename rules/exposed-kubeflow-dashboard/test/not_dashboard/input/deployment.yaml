@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-web-app
+  namespace: kubeflow
+  labels:
+    app: jupyter-web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter-web-app
+  template:
+    metadata:
+      labels:
+        app: jupyter-web-app
+    spec:
+      containers:
+        - name: jupyter-web-app
+          image: ghcr.io/kubeflow/kubeflow/central-dashboard:v1.10.0
+          ports:
+            - containerPort: 8082

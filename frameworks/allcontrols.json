@@ -421,6 +421,12 @@
             "patch": {
                 "name": "CVE-2026-42880-argocd-server-side-diff-secret-extraction"
             }
+        },
+        {
+            "controlID": "C-0298",
+            "patch": {
+                "name": "Kubeflow dashboard exposed"
+            }
         }
     ]
 }

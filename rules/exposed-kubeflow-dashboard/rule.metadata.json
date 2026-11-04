@@ -1,0 +1,21 @@
+{
+  "name": "exposed-kubeflow-dashboard",
+  "attributes": {},
+  "ruleLanguage": "Rego",
+  "match": [
+    {
+      "apiGroups": [""],
+      "apiVersions": ["v1"],
+      "resources": ["Pod", "Service"]
+    },
+    {
+      "apiGroups": ["apps"],
+      "apiVersions": ["v1"],
+      "resources": ["Deployment", "ReplicaSet", "DaemonSet", "StatefulSet"]
+    }
+  ],
+  "ruleDependencies": [],
+  "description": "Fails if the Kubeflow central dashboard is exposed to the internet by a LoadBalancer service",
+  "remediation": "Change the service type to ClusterIP and expose the dashboard through an authenticated gateway, or make the load balancer internal or restrict loadBalancerSourceRanges to trusted IP ranges.",
+  "ruleQuery": "armo_builtins"
+}

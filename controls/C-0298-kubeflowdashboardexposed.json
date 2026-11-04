@@ -1,0 +1,19 @@
+{
+    "name": "Kubeflow dashboard exposed",
+    "attributes": {
+        "controlTypeTags": ["security", "compliance"]
+    },
+    "description": "The Kubeflow central dashboard is exposed to the internet by a LoadBalancer service. An exposed Kubeflow dashboard makes the management interface of your Kubeflow environment accessible from the internet and allows attackers to exploit any authentication and access control gaps that may be present.",
+    "remediation": "Change the service type to ClusterIP and expose the dashboard through an authenticated gateway, or make the load balancer internal or restrict loadBalancerSourceRanges to trusted IP ranges.",
+    "test": "Checks if a LoadBalancer service with an external address selects the Kubeflow centraldashboard workload, excluding internal load balancers and load balancers restricted by loadBalancerSourceRanges.",
+    "rulesNames": ["exposed-kubeflow-dashboard"],
+    "long_description": "The Kubeflow central dashboard (centraldashboard) is the web interface for Kubeflow and gives access to notebooks, pipelines and other ML workloads. When it is selected by a LoadBalancer service that has an external address, is not marked as internal and does not restrict loadBalancerSourceRanges, the dashboard is reachable from the internet. Attackers can use it to exploit weak or missing authentication and run arbitrary workloads in the cluster.",
+    "controlID": "C-0298",
+    "baseScore": 6.0,
+    "category": {
+        "name": "Network"
+    },
+    "scanningScope": {
+        "matches": ["cluster"]
+    }
+}
