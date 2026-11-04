@@ -1,0 +1,25 @@
+[
+  {
+    "alertMessage": "Kubeflow dashboard kubeflow/centraldashboard is exposed to the internet by LoadBalancer service: centraldashboard",
+    "packagename": "armo_builtins",
+    "alertScore": 6,
+    "reviewPaths": [
+      "spec.type"
+    ],
+    "failedPaths": [
+      "spec.type"
+    ],
+    "fixPaths": [],
+    "alertObject": {
+      "k8sApiObjects": [
+        {
+          "apiVersion": "v1",
+          "kind": "Service",
+          "metadata": {
+            "name": "centraldashboard"
+          }
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: centraldashboard
+  namespace: kubeflow
+spec:
+  type: LoadBalancer
+  selector:
+    app: centraldashboard
+  ports:
+    - port: 80
+      targetPort: 8082
+  loadBalancerSourceRanges:
+    - 0.0.0.0/1
+    - 128.0.0.0/1
+status:
+  loadBalancer:
+    ingress:
+      - hostname: a1b2c3.elb.eu-west-1.amazonaws.com
